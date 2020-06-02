@@ -35,23 +35,25 @@ class Schedule(object):
         self.PLchromosome = Chromosome(length)
         self.PLchromosome.initChromosom()
         self.PLlength = length
-        
+
     def initialize(self):
         ''' loop over jobs list for each product
         loop for the number of slots needed by each product
         randomly add product to genearray
          '''        
-        # for i in jobs:
-        #     for j in range(int(i.totaltime)):
-        #         self.chromosome.geneArray[random.randrange(0, self.chromosome.genes)].append(i)                
-
         #Schedule Mixers chromosome
         for i in jobs:
             #Mixing time + mixer cleaning time
             for j in range(int(i.cTime + i.MNO.cT)):
-                self.Mchromosome.geneArray[random.randrange(0,  self.Mchromosome.genes)].append(i)    
+                self.Mchromosome.geneArray[random.randrange(0,  self.Mchromosome.genes)].append(i)   
+        #Schedule Production Line chromosome        
         for i in jobs:
-            for j in range(int(i.cTime + i.MNO.cT)):
+            for j in range(int(i.line.cT)):
+                self.PLchromosome.geneArray[random.randrange(0,  self.PLchromosome.genes)].append(i)   
+        #Schedule Storage Tanks chromosome        
+        for i in jobs:
+            for j in range(int(i.line.cT)):
+                self.PLchromosome.geneArray[random.randrange(0,  self.PLchromosome.genes)].append(i)   
 
     def __repr__(self):
         return str(self.Mchromosome.geneArray)
