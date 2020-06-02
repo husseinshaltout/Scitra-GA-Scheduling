@@ -27,7 +27,15 @@ class Schedule(object):
         self.Mchromosome=Chromosome(length)
         self.Mchromosome.initChromosom()
         self.Mlength=length
-
+        #Storage Tank Chromosome
+        self.STchromosome = Chromosome(length)
+        self.STchromosome.initChromosom()
+        self.STlength = length
+        #Production Line Chromosome
+        self.PLchromosome = Chromosome(length)
+        self.PLchromosome.initChromosom()
+        self.PLlength = length
+        
     def initialize(self):
         ''' loop over jobs list for each product
         loop for the number of slots needed by each product
@@ -38,15 +46,16 @@ class Schedule(object):
         #         self.chromosome.geneArray[random.randrange(0, self.chromosome.genes)].append(i)                
 
         #Schedule Mixers chromosome
-        counter = 0
         for i in jobs:
             #Mixing time + mixer cleaning time
             for j in range(int(i.cTime + i.MNO.cT)):
-                self.Mchromosome.geneArray[random.randrange(0,  self.Mchromosome.genes)].append(i)                
-                counter +=1
+                self.Mchromosome.geneArray[random.randrange(0,  self.Mchromosome.genes)].append(i)    
+        for i in jobs:
+            for j in range(int(i.cTime + i.MNO.cT)):
+
     def __repr__(self):
         return str(self.Mchromosome.geneArray)
-
+ 
 def crossover(a,b):
     pass
 
@@ -75,9 +84,9 @@ def displayPop(population):
     print("Generation 2")
     print(displaylist[1])
 
-def start():
-    pop = CreateInitPop(12,2)
-
+def start(days, hours, machines, popsize):
+    length = days*hours*machines
+    pop = CreateInitPop(length,popsize)
     displayPop(pop)
 
-start()    
+start(5,8,6,20)    
