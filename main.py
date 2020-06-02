@@ -42,24 +42,29 @@ class Schedule(object):
         randomly add product in random time slots to genearray
         '''        
         #Schedule Mixers chromosome
-        # print("self.Mchromosome.genes: ", self.Mchromosome.genes)
         for i in jobs:
-            #Mixing time + mixer cleaning time + change over time
-            for j in range(0, int(i.cTime + i.MNO.cT + i.cot)):
-                k = random.randrange(0,  self.Mchromosome.genes)
-                print(k)
-                if (len(self.Mchromosome.geneArray[k]) == 0):
-                    self.Mchromosome.geneArray[k].append(i)                
-                # self.Mchromosome.geneArray[random.randrange(0,  self.Mchromosome.genes)].append(i)   
-    def __repr__(self):
-        return str(self.Mchromosome.geneArray)
-
-''' 
-       #Schedule Production Line chromosome        
-        for i in jobs:
-            for j in range(int(i.line.cT)):
-                self.PLchromosome.geneArray[random.randrange(0,  self.PLchromosome.genes)].append(i)   
+            if (i.isOutSourced == True):
+                Tobestored.append(i)
+            else:
+                #Mixing time + mixer cleaning time + change over time
+                for j in range(0, int(i.cTime + i.MNO.cT + i.cot)):
+                    k = random.randrange(0,  self.Mchromosome.genes)                
+                    if (len(self.Mchromosome.geneArray[k]) == 0):
+                        self.Mchromosome.geneArray[k].append(i)                
+                    # self.Mchromosome.geneArray[random.randrange(0,  self.Mchromosome.genes)].append(i)   
+                #Add mixed products to be stored 
+                Tobestored.append(i)
         #Schedule Storage Tanks chromosome        
+        for i in Tobestored:
+            for j in range(2):
+                self.STchromosome.geneArray[random.randrange(0,  self.STchromosome.genes)].append(i)   
+
+    def __repr__(self):
+        return str(self.Mchromosome.geneArray), str(self.STchromosome.geneArray)
+    def __len__(self):
+        return len(self.Mchromosome.geneArray)
+'''
+       #Schedule Production Line chromosome        
         for i in jobs:
             for j in range(int(i.line.cT)):
                 self.PLchromosome.geneArray[random.randrange(0,  self.PLchromosome.genes)].append(i)   
@@ -81,15 +86,16 @@ def CreateInitPop(length, gensize):
         i += 1
     return generation
     
-# pp = pprint.PrettyPrinter(indent=24, compact=True)
-
+# pp = pprint.PrettyPrinter(width = 4)
 
 def displayPop(population):
     displaylist = [] 
     for i in population:
-        displaylist.append(i)
-    print("Generation 1")
-    pprint.pprint(displaylist[0])
+        for j in i:
+            displaylist.append(j)
+    print(displaylist)
+    # print("Generation 1")
+    # pprint.pprint(displaylist[0])
     # print("Generation 2")
     # pprint.pprint(displaylist[1])
 
@@ -98,4 +104,4 @@ def start(days, hours, machines, popsize):
     pop = CreateInitPop(length,popsize)
     displayPop(pop)
 
-start(5,12,1,20)    
+start(5,12,2,20)    
