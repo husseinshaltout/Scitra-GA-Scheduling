@@ -1,5 +1,6 @@
 from Def import *
 import random
+import pprint
 class Chromosome(object):
 	def __init__(self, length):
 		self.genes=length
@@ -50,12 +51,18 @@ def CreateInitPop(length, gensize):
         generation.append(schedule)
         i += 1
     return generation
+    
+# pp = pprint.PrettyPrinter(indent=24, compact=True)
+
 
 def displayPop(population):
-	displaylist=[]
-	for i in population:
-		displaylist.append(i)
-	print(displaylist)
+    displaylist = [] 
+    for i in population:
+        displaylist.append(i)
+    print("Generation 1")
+    print(displaylist[0])
+    print("Generation 2")
+    print(displaylist[1])
 
 def start():
     pop = CreateInitPop(24,10)
