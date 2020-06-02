@@ -40,8 +40,9 @@ class Schedule(object):
         #Schedule Mixers chromosome
         counter = 0
         for i in jobs:
-            while( counter < 12 ):
-                self.ge
+            #Mixing time + mixer cleaning time
+            while( counter < int(i.cTime + i.MNO.cT)):
+                self.Mchromosome.geneArray[random.randrange(0,  self.Mchromosome.genes)].append(i)
                 counter +=1
     def __repr__(self):
         return str(self.chromosome.geneArray)
