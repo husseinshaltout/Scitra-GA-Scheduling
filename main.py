@@ -41,13 +41,11 @@ class Schedule(object):
         counter = 0
         for i in jobs:
             #Mixing time + mixer cleaning time
-            # while( counter < int(i.cTime + i.MNO.cT)):
             for j in range(int(i.cTime + i.MNO.cT)):
-                self.Mchromosome.geneArray[random.randrange(0,  self.Mchromosome.genes)].append(i)
-                print(i)
+                self.Mchromosome.geneArray[random.randrange(0,  self.Mchromosome.genes)].append(i)                
                 counter +=1
     def __repr__(self):
-        return str(self.chromosome.geneArray)
+        return str(self.Mchromosome.geneArray)
 
 def crossover(a,b):
     pass
