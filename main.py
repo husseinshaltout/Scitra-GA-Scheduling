@@ -23,16 +23,26 @@ class Schedule(object):
         self.chromosome=Chromosome(length)
         self.chromosome.initChromosom()
         self.length=length
+        #Mixer chromosome
+        self.Mchromosome=Chromosome(length)
+        self.Mchromosome.initChromosom()
+        self.Mlength=length
 
     def initialize(self):
         ''' loop over jobs list for each product
         loop for the number of slots needed by each product
         randomly add product to genearray
-         '''
-        print("in initailize")
+         '''        
         for i in jobs:
             for j in range(int(i.totaltime)):
                 self.chromosome.geneArray[random.randrange(0, self.chromosome.genes)].append(i)                
+
+        #Schedule Mixers chromosome
+        counter = 0
+        for i in jobs:
+            while( counter < 12 ):
+                self.ge
+                counter +=1
     def __repr__(self):
         return str(self.chromosome.geneArray)
 
