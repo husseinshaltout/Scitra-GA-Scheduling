@@ -39,14 +39,23 @@ class Schedule(object):
     def initialize(self):
         ''' loop over jobs list for each product
         loop for the number of slots needed by each product
-        randomly add product to genearray
-         '''        
+        randomly add product in random time slots to genearray
+        '''        
         #Schedule Mixers chromosome
+        # print("self.Mchromosome.genes: ", self.Mchromosome.genes)
         for i in jobs:
-            #Mixing time + mixer cleaning time
-            for j in range(int(i.cTime + i.MNO.cT)):
-                self.Mchromosome.geneArray[random.randrange(0,  self.Mchromosome.genes)].append(i)   
-        #Schedule Production Line chromosome        
+            #Mixing time + mixer cleaning time + change over time
+            for j in range(0, int(i.cTime + i.MNO.cT + i.cot)):
+                k = random.randrange(0,  self.Mchromosome.genes)
+                print(k)
+                if (len(self.Mchromosome.geneArray[k]) == 0):
+                    self.Mchromosome.geneArray[k].append(i)                
+                # self.Mchromosome.geneArray[random.randrange(0,  self.Mchromosome.genes)].append(i)   
+    def __repr__(self):
+        return str(self.Mchromosome.geneArray)
+
+''' 
+       #Schedule Production Line chromosome        
         for i in jobs:
             for j in range(int(i.line.cT)):
                 self.PLchromosome.geneArray[random.randrange(0,  self.PLchromosome.genes)].append(i)   
@@ -54,9 +63,7 @@ class Schedule(object):
         for i in jobs:
             for j in range(int(i.line.cT)):
                 self.PLchromosome.geneArray[random.randrange(0,  self.PLchromosome.genes)].append(i)   
-
-    def __repr__(self):
-        return str(self.Mchromosome.geneArray)
+'''
  
 def crossover(a,b):
     pass
@@ -82,13 +89,13 @@ def displayPop(population):
     for i in population:
         displaylist.append(i)
     print("Generation 1")
-    print(displaylist[0])
-    print("Generation 2")
-    print(displaylist[1])
+    pprint.pprint(displaylist[0])
+    # print("Generation 2")
+    # pprint.pprint(displaylist[1])
 
 def start(days, hours, machines, popsize):
     length = days*hours*machines
     pop = CreateInitPop(length,popsize)
     displayPop(pop)
 
-start(5,8,6,20)    
+start(5,12,1,20)    
