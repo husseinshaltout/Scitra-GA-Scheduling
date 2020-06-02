@@ -33,16 +33,18 @@ class Schedule(object):
         loop for the number of slots needed by each product
         randomly add product to genearray
          '''        
-        for i in jobs:
-            for j in range(int(i.totaltime)):
-                self.chromosome.geneArray[random.randrange(0, self.chromosome.genes)].append(i)                
+        # for i in jobs:
+        #     for j in range(int(i.totaltime)):
+        #         self.chromosome.geneArray[random.randrange(0, self.chromosome.genes)].append(i)                
 
         #Schedule Mixers chromosome
         counter = 0
         for i in jobs:
             #Mixing time + mixer cleaning time
-            while( counter < int(i.cTime + i.MNO.cT)):
+            # while( counter < int(i.cTime + i.MNO.cT)):
+            for j in range(int(i.cTime + i.MNO.cT)):
                 self.Mchromosome.geneArray[random.randrange(0,  self.Mchromosome.genes)].append(i)
+                print(i)
                 counter +=1
     def __repr__(self):
         return str(self.chromosome.geneArray)
@@ -76,7 +78,7 @@ def displayPop(population):
     print(displaylist[1])
 
 def start():
-    pop = CreateInitPop(24,10)
+    pop = CreateInitPop(12,2)
 
     displayPop(pop)
 
