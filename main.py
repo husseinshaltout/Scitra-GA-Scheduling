@@ -58,7 +58,7 @@ def displayPop(population):
 	print(displaylist)
 
 def start():
-    pop = CreateInitPop(5,1)
+    pop = CreateInitPop(24,10)
 
     displayPop(pop)
 
