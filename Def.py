@@ -33,7 +33,7 @@ class Product(Mixer):
     def __repr__(self):
         return str(self.name)
 
-mixer_2 = Mixer(2,1.5)
+mixer_2 = Mixer(2,2)
 # mixer_1 = Mixer(0.5,1.5)
 
 storagetank_1 = StorageTank("StorageTank 1", 2, 1.5)
@@ -50,16 +50,17 @@ Tubes_PL = ProductionLine("Tubes",1)
 Cream1_PL = ProductionLine("Cream 1",1)
 Cream2_PL = ProductionLine("Cream 2",1)
 
-Ferrari = Product("Mixer 2", "Ferrari1", mixer_2, Cream1_PL, 1.5, 32, 8, 6, False)
-StarWors = Product("Mixer 1", "Cream Star wors20", mixer_2, Cream2_PL, 1.5, 44, 8, 0, True)
-jobs = [Ferrari, StarWors]
+Ferrari = Product("Mixer 2(2T)", "Ferrari1", mixer_2, Cream1_PL, 1.5, 32, 2, 6, False)
+Comoder = Product("Mixer 2(2T)", "ComoderPC", mixer_2, Rollon_PL, 3, 160, 2, 4, False)
+# StarWors = Product("Mixer 1(0.5T)", "Cream Star wors20", mixer_1, Cream2_PL, 1.5, 44, 2, 0, True)
+jobs = [Ferrari, Comoder]
 print(Ferrari.name,Ferrari.cTime + Ferrari.MNO.cT +Ferrari.cot)
-print(StarWors.name,StarWors.cTime + StarWors.MNO.cT + StarWors.cot)
+print(Comoder.name,Comoder.cTime + Comoder.MNO.cT + Comoder.cot)
 Tobestored = []
 StorageTanks = [storagetank_1,storagetank_1]
 '''
             #    8  9   10  11  12  01  02  03  
-Mchromosome = [ [Ferrari], [Ferrari], [Ferrari], [Ferrari], [Ferrari], [Ferrari], [], [], [], [], [], [], #Sunday
+Mchromosome = [ [], [Ferrari], [Ferrari], [Ferrari], [Ferrari], [Ferrari], [], [], [], [], [], [], #Sunday
                [], [], [], [], [], [], [], [], [Ferrari], [], [], [], #Monday
                [], [], [], [], [], [], [], [], [Ferrari], [], [], [] , #Tuesday
                [], [], [], [], [], [], [], [], [Ferrari], [], [], [] , #Wednesday

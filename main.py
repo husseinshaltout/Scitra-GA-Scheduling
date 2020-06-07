@@ -48,19 +48,22 @@ class Schedule(object):
             else:
                 #Mixing time + mixer cleaning time + change over time
                 for j in range(0, int(i.cTime + i.MNO.cT + i.cot)):
-                    k = random.randrange(0,  self.Mchromosome.genes)                
+                    k = random.randrange(0,  self.Mchromosome.genes, 2)                
                     if (len(self.Mchromosome.geneArray[k]) == 0):
-                        self.Mchromosome.geneArray[k].append(i)                
+                        self.Mchromosome.geneArray[k].append(i) 
+                        #Constrain no.9 each product takes 2 slots for mixing
+                        #To be changed for variable amount of time needed for mixing
+                        self.Mchromosome.geneArray[k+1].append(i)                
                     # self.Mchromosome.geneArray[random.randrange(0,  self.Mchromosome.genes)].append(i)   
                 #Add mixed products to be stored 
                 Tobestored.append(i)
         #Schedule Storage Tanks chromosome        
-        for i in Tobestored:
-            for j in range(2):
-                self.STchromosome.geneArray[random.randrange(0,  self.STchromosome.genes)].append(i)   
+        # for i in Tobestored:
+        #     for j in range(2):
+        #         self.STchromosome.geneArray[random.randrange(0,  self.STchromosome.genes)].append(i)   
 
     def __repr__(self):
-        return str(self.Mchromosome.geneArray), str(self.STchromosome.geneArray)
+        return str(self.Mchromosome.geneArray)
     def __len__(self):
         return len(self.Mchromosome.geneArray)
 '''
@@ -91,9 +94,9 @@ def CreateInitPop(length, gensize):
 def displayPop(population):
     displaylist = [] 
     for i in population:
-        for j in i:
-            displaylist.append(j)
-    print(displaylist)
+        # for j in i:
+        displaylist.append(i)
+    print(displaylist[0])
     # print("Generation 1")
     # pprint.pprint(displaylist[0])
     # print("Generation 2")
@@ -104,4 +107,4 @@ def start(days, hours, machines, popsize):
     pop = CreateInitPop(length,popsize)
     displayPop(pop)
 
-start(5,12,2,20)    
+start(7,24,1,10)    
