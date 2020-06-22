@@ -3,61 +3,71 @@ class Mixer(object):
     def __init__(self, mixerSize, cleaningTime):
         self.size = mixerSize
         self.cT = cleaningTime
+        self.name = "Mixer"
+    def __repr__(self):
+        return str(self.name)
 
 class StorageTank(object):
 
-    def __init__(self, TankName, tankSize, cleaningTime):
+    def __init__(self, TankName, tankSize):
         self.name = TankName
         self.size = tankSize
-        self.cT = cleaningTime
-
-class ProductionLine(object):
-    def __init__(self, plName, cleaningTime):
-        self.name = plName
-        self.cT= cleaningTime
     def __repr__(self):
         return str(self.name)
-class Product(Mixer):
+
+class Product(object):
     machines = []
-    def __init__(self, mL, pName, mixerNo, productionLine, COT, netSpeed, headCount, cycleTime, isOutSourced):
-        self.machines = mL
-        self.name = pName
-        self.MNO = mixerNo
-        self.line = productionLine
-        self.cot  = COT #Change over time
+    def __init__(self, pName, mixerNo, productionLine, netSpeed, cycleTime, PLcleaningtime, PPST, isOutSourced):
+        self.name = pName #Product name
+        self.MNO = mixerNo #Mixer number
+        self.line = productionLine #Production Line
         self.speed = netSpeed #Net speed
-        self.heads = headCount
         self.cTime = cycleTime #Cycle time
-        self.totaltime = self.cot + self.cTime + self.MNO.cT + self.line.cT
+        self.PLCT = PLcleaningtime #Production line cleaing time
+        self.PPST = PPST #Number of products per storage tank
         self.isOutSourced = isOutSourced
     def __repr__(self):
+        return str(self.name)  
+
+class ProductionLine(object):
+    def __init__(self, plName):
+        self.name = plName
+    def __repr__(self):
         return str(self.name)
 
-mixer_2 = Mixer(2,2)
-# mixer_1 = Mixer(0.5,1.5)
+mixer_2 = Mixer(2,1)
 
-storagetank_1 = StorageTank("StorageTank 1", 2, 1.5)
-# storagetank_2 = StorageTank("StorageTank 2", 2, 1.5)
-# storagetank_3 = StorageTank("StorageTank 3", 2, 1.5)
-# storagetank_4 = StorageTank("StorageTank 4", 2, 1.5)
-# storagetank_5 = StorageTank("StorageTank 5", 2, 1.5)
-# storagetank_6 = StorageTank("StorageTank 6", 2, 1.5)
-# storagetank_7 = StorageTank("StorageTank 7", 2, 1.5)
-# storagetank_8 = StorageTank("StorageTank 8", 2, 1.5)
+storagetank_1 = StorageTank("StorageTank_1", 2)
+storagetank_2 = StorageTank("StorageTank 2", 2)
+storagetank_3 = StorageTank("StorageTank 3", 2)
+storagetank_4 = StorageTank("StorageTank 4", 2)
+storagetank_5 = StorageTank("StorageTank 5", 2)
+storagetank_6 = StorageTank("StorageTank 6", 2)
+storagetank_7 = StorageTank("StorageTank 7", 2)
+storagetank_8 = StorageTank("StorageTank 8", 2)
 
-Rollon_PL = ProductionLine("Rollon",1)
-Tubes_PL = ProductionLine("Tubes",1)
-Cream1_PL = ProductionLine("Cream 1",1)
-Cream2_PL = ProductionLine("Cream 2",1)
+Rollon_PL = ProductionLine("Rollon")
+Tubes_PL = ProductionLine("Tubes")
+Cream1_PL = ProductionLine("Cream 1")
+Cream2_PL = ProductionLine("Cream 2")
 
-Ferrari = Product("Mixer 2(2T)", "Ferrari1", mixer_2, Cream1_PL, 1.5, 32, 2, 6, False)
-Comoder = Product("Mixer 2(2T)", "ComoderPC", mixer_2, Rollon_PL, 3, 160, 2, 4, False)
-# StarWors = Product("Mixer 1(0.5T)", "Cream Star wors20", mixer_1, Cream2_PL, 1.5, 44, 2, 0, True)
-jobs = [Ferrari, Comoder]
-print(Ferrari.name,Ferrari.cTime + Ferrari.MNO.cT +Ferrari.cot)
-print(Comoder.name,Comoder.cTime + Comoder.MNO.cT + Comoder.cot)
+Cream_Starwors50 = Product("Cream_Starwors50", mixer_2, Cream1_PL, 80, 2, 8, 40000, False)
+Cream_Jungle150 = Product("Cream_Jungle150", mixer_2, Cream2_PL, 48, 2, 5, 13333, False)
+Rollon_STarwors50 = Product("Rollon_STarwors50", mixer_2, Rollon_PL, 9600, 2, 4, 40000, False)
+Tube_Jungle50 = Product("Tube_Jungle50 ", mixer_2, Tubes_PL, 72, 2, 9, 40000, False)
+
+StorangeTanks = [storagetank_1, storagetank_2, storagetank_3, storagetank_4, storagetank_5, storagetank_6, storagetank_7, storagetank_8]
+
+jobs = [Cream_Starwors50, Cream_Jungle150, Rollon_STarwors50, Tube_Jungle50]
+machines = [mixer_2, Rollon_PL, Tubes_PL, Cream1_PL, Cream2_PL, StorangeTanks]
+operations = [(machines[0],jobs[0]),(machines[5][1],jobs[0])]
+
+print(Cream_Starwors50.name, Cream_Jungle150.MNO.cT + Cream_Jungle150.cTime)
+print(Cream_Jungle150.name, Cream_Jungle150.MNO.cT + Cream_Jungle150.cTime)
+
 Tobestored = []
-StorageTanks = [storagetank_1,storagetank_1]
+
+
 '''
             #    8  9   10  11  12  01  02  03  
 Mchromosome = [ [], [Ferrari], [Ferrari], [Ferrari], [Ferrari], [Ferrari], [], [], [], [], [], [], #Sunday

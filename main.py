@@ -42,25 +42,26 @@ class Schedule(object):
         randomly add product in random time slots to genearray
         '''        
         #Schedule Mixers chromosome
-        for i in jobs:
+        for i in jobs:            
+            #Mixing total time: Mixing time + mixer cleaning time
+            MTT = i.cTime + i.MNO.cT
             if (i.isOutSourced == True):
                 Tobestored.append(i)
-            else:
-                #Mixing time + mixer cleaning time + change over time
-                for j in range(0, int(i.cTime + i.MNO.cT + i.cot)):
-                    k = random.randrange(0,  self.Mchromosome.genes, 2)                
+            else:         
+                #Step = no. of needed continous slots       
+                for j in range(0, MTT, 2):
+                    k = random.randrange(0,  self.Mchromosome.genes-1)                
                     if (len(self.Mchromosome.geneArray[k]) == 0):
-                        self.Mchromosome.geneArray[k].append(i) 
-                        #Constrain no.9 each product takes 2 slots for mixing
-                        #To be changed for variable amount of time needed for mixing
-                        self.Mchromosome.geneArray[k+1].append(i)                
-                    # self.Mchromosome.geneArray[random.randrange(0,  self.Mchromosome.genes)].append(i)   
+                    #Constrain no.9 each product takes 2 slots for mixing
+                    #To be changed for variable amount of time needed for mixing
+                        self.Mchromosome.geneArray[k].append(i)
+                        self.Mchromosome.geneArray[k+1].append(i)   
                 #Add mixed products to be stored 
                 Tobestored.append(i)
         #Schedule Storage Tanks chromosome        
         # for i in Tobestored:
         #     for j in range(2):
-        #         self.STchromosome.geneArray[random.randrange(0,  self.STchromosome.genes)].append(i)   
+        #         self.STchromosome.geneArray[random.randrange(0,  self.STchromosome.genes)].append(i)     
 
     def __repr__(self):
         return str(self.Mchromosome.geneArray)
@@ -96,7 +97,7 @@ def displayPop(population):
     for i in population:
         # for j in i:
         displaylist.append(i)
-    print(displaylist[0])
+    print(displaylist)
     # print("Generation 1")
     # pprint.pprint(displaylist[0])
     # print("Generation 2")
@@ -107,4 +108,4 @@ def start(days, hours, machines, popsize):
     pop = CreateInitPop(length,popsize)
     displayPop(pop)
 
-start(7,24,1,10)    
+start(7,24,2,10)    
