@@ -1,6 +1,21 @@
 from Def import *
 import random
-import pprint
+import operator
+import pandas
+import numpy
+import math
+''' 
+We need a slot (time-space slot) for each hour (we assume that time is in one hour granules), 
+for every machine, every day. Also, we assume that manufacturing is 24 hours, 
+and working days are from Sunday to Saturaday (7 days total).
+We can use an list with a size 24*7*number_of_machines.
+The slot should be a list because during the execution of our algorithm, 
+we allow multiple operations during the same time-space slot.
+There is an additional hash map(dictionary) which is used to obtain the first time-space slot 
+at which an operation begins (its position in list) from the address of the product' object.
+Each hour of an operation has a separate entry in the list, but there is only one entry per operation in the hash map. 
+For instance, if an operation starts at 1pm and lasts for three hours, it has entries in the 1pm, 2pm, and 3pm slots.
+'''
 class Chromosome(object):
     def __init__(self, length):
         self.genes=length
@@ -19,23 +34,32 @@ class fitness(object):
         self.schedule = individual
         self.score=0
     def computeScore(self):
+        '''Takes an individual of the population '''
         score = 0
         schedulearray = self.schedule.getGeneArray()
         makespandict = {}
+        # demanddict = {}
+        # PLclass = ProductionLine("PLclass")
         #get solts for each product
         for i in schedulearray:
             for j in i:
                 if j[1] in makespandict:
                     makespandict[j[1]].append(schedulearray.index(i))                  
                 else:
-                    makespandict[j[1]] = [schedulearray.index(i)]
+                    makespandict[j[1]] = [schedulearray.index(i)]                    
+#                 #Dict for cleaning time
+#                 if type(j[0]) == type(PLclass):
+#                     if j[1] in demanddict:
+#                         demanddict[j[1]].append(j[1].PLCT)  
+#                     else:
+#                         demanddict[j[1]] = [j[1].PLCT]                                
         totalmakespan = 0            
-        for i in makespandict:               
-            print("Make span of",i,makespandict[i][-1] - makespandict[i][0])
-            totalmakespan += makespandict[-1] - makespandict[0]
+        for i in makespandict:  
+            #add total makespan last solt of operation - first slot
+            totalmakespan += (makespandict[i][-1] - makespandict[i][0]) + 1
+           
+        return totalmakespan
 
-                    
-        return makespandict
 class Schedule(object):
     def __init__(self, length):        
         self.chromosome=Chromosome(length)
@@ -52,23 +76,30 @@ class Schedule(object):
             Mdur = i[0][1].cTime
             STdur = 1
             PLdur = i[2][1].PLCT
+            #Prodcution
+            SlotsperTank = int(math.ceil(i[2][1].PPST/(i[2][1].speed*60)))
+            Nbatch = int(math.ceil(i[2][1].demand/i[2][1].PPST))   
             pos1 = random.randrange(0, self.chromosome.genes - Mdur)
             pos2 = random.randrange(0, self.chromosome.genes - STdur)
-            pos3 = random.randrange(0, self.chromosome.genes - PLdur)
+            pos3 = random.randrange(0, self.chromosome.genes - (PLdur + SlotsperTank))
+
             #assign mixing operation
             for j in range(Mdur, 0, -1):
                 self.chromosome.geneArray[pos1 + j].append(i[0])
             #assign storing operation
             for k in range(STdur, 0, -1):                
                 self.chromosome.geneArray[pos2 + k].append(i[1])
-            #production operation
-            for m in range(PLdur, 0, -1):                
-                self.chromosome.geneArray[pos3 + m].append(i[2]) 
+            #For number of batches needed to fulfill demand
+            for n in range(Nbatch):
+                #assin production and cleaining
+                for m in range(SlotsperTank + PLdur, 0, -1):                
+                    self.chromosome.geneArray[pos3 + m].append(i[2])   
                 
     def populateSchedule(self,hashtable):
         for i in hashtable.keys():
             temp=str(i)[-1]
             temp2=int(temp)
+#             print("Key index:",temp2,"len of chromosome", len(self.chromosome.geneArray))
             self.chromosome.geneArray[(temp2)].append(hashtable[i])
     def getGeneArray(self):
         return self.chromosome.geneArray
@@ -78,6 +109,7 @@ class Schedule(object):
         return str(self.chromosome.geneArray)
     def __len__(self):
         return len(self.chromosome.geneArray)
+
 def hashing(sch):
     hashtable={}
     genes=sch.getGeneArray()
@@ -94,7 +126,7 @@ def hashReverse(schHash,length):
     sch.populateSchedule(schHash)
     return sch 
 
- def CreateInitPop(length, gensize):
+def CreateInitPop(length, gensize):
     generation = []
     i = 0
     while (i < gensize):
@@ -128,7 +160,6 @@ def tournamentSelection(rankedPop, eliteSize):
                 selectionPool.append(rankedPop[j][0])
                 break
     return selectionPool
-            
     #return array of selected parents    
 
 def matingPool(population, selectionPool):
@@ -179,7 +210,7 @@ def breed(schParentA, schParentB):
 
 def crossover(matingpool, eliteSize):
     nextGen = []
-    randPool = random.sample(matingpool, len(matingpool))
+    # randPool = random.sample(matingpool, len(matingpool))
     #add elite to next gen
     for i in range(0,eliteSize):
         nextGen.append(matingpool[i])
@@ -190,34 +221,65 @@ def crossover(matingpool, eliteSize):
         nextGen.append(child)
     return nextGen
 
-def mutate():
-    pass
+def mutate(schHash, mutationRate, mutationSize):
+    for i in range(len(schHash)):
+        if(random.random() < mutationRate):
+            for j in range(0,mutationSize):
+                #swap mutation
+                swapWith = int(random.random() * len(schHash))
+                operation_1 = schHash[list(schHash.keys())[i]]
+                operation_2 = schHash[list(schHash.keys())[swapWith]]
+                schHash[list(schHash.keys())[i]] = operation_2
+                schHash[list(schHash.keys())[swapWith]] = operation_1
+    return schHash
 
-def CreateInitPop(length, gensize):
-    generation = []
-    i = 0
-    while (i < gensize):
-        schedule = Schedule(length)
-        schedule.initialize()
-        generation.append(schedule)
-        i += 1
-    return generation
-    
+def mutatePop(population, mutationRate, mutationSize):
+    mutatedPop = []
+    for i in range(0, len(population)):
+        #hash pop to be ready for mutation
+        mutatedHash=hashing(population[i])
+        mutated = mutate(mutatedHash, mutationRate, mutationSize)
+        mutatedPop.append(mutated)
+    return mutatedPop    
+
+def getNextGen(currentGen, eliteSize, mutationRate, mutationSize):
+    popRanked = rank(currentGen)
+    selectionResults = tournamentSelection(popRanked, eliteSize)
+    matingpool = matingPool(currentGen, selectionResults)
+    children = crossover(matingpool, eliteSize)
+    nextGenHashes = mutatePop(children, mutationRate, mutationSize)    
+    nextGeneration=[]
+#     print(nextGenHashes)
+    for i in nextGenHashes:
+        individual=hashReverse(i,len(currentGen))
+        nextGeneration.append(individual)
+    return nextGeneration        
 
 def displayPop(population):
     displaylist = [] 
     for i in population:
-        # for j in i:
         displaylist.append(i)
     print(displaylist)
-    # print("Generation 1")
-    # pprint.pprint(displaylist[0])
-    # print("Generation 2")
-    # pprint.pprint(displaylist[1])
 
-def start(days, hours, machines, popsize):
-    length = days*hours*machines
-    pop = CreateInitPop(length,popsize)
-    return displayPop(pop)
+def geneticAlgorithm(popSize, days, slots, machines, eliteSize, mutationRate, mutationSize, generations):
+    length=days*slots*machines
+    pop = CreateInitPop(length, popSize)
+    print("Initial Score: %d"%rank(pop)[0][1])
+#     displayPop(pop)
 
-start(7,24,2,10)    
+    for i in range(0, generations):
+        pop = getNextGen(pop, eliteSize, mutationRate, mutationSize)
+        print(pop)
+
+    print("Final Score: " + str(rank(pop)[0][1]))
+    bestScheduleIndex = rank(pop)[0][0]
+    bestSchedule = pop[bestScheduleIndex]
+    return bestSchedule
+ga = geneticAlgorithm(popSize=10,days=7,slots=24,machines=6, eliteSize=1, mutationRate=0.01, mutationSize=1,generations=10)    
+
+# def start(days, hours, machines, popsize):
+#     length = days*hours*machines
+#     pop = CreateInitPop(length,popsize)
+#     return displayPop(pop)
+
+# start(7,24,2,10)    
