@@ -60,19 +60,9 @@ StorangeTanks = [storagetank_1, storagetank_2, storagetank_3, storagetank_4, sto
 
 jobs = [Cream_Starwors50, Cream_Jungle150, Rollon_STarwors50, Tube_Jungle50]
 machines = [mixer_2, Rollon_PL, Tubes_PL, Cream1_PL, Cream2_PL, StorangeTanks]
-# operations = [(machines[0],jobs[0]),(machines[5][1],jobs[0])]
+
 
 
 Tobestored = []
 
 
-'''
-            #    8  9   10  11  12  01  02  03  
-Mchromosome = [ [], [Ferrari], [Ferrari], [Ferrari], [Ferrari], [Ferrari], [], [], [], [], [], [], #Sunday
-               [], [], [], [], [], [], [], [], [Ferrari], [], [], [], #Monday
-               [], [], [], [], [], [], [], [], [Ferrari], [], [], [] , #Tuesday
-               [], [], [], [], [], [], [], [], [Ferrari], [], [], [] , #Wednesday
-               [], [], [], [], [], [], [], [] , [Ferrari], [], [], [] ] #Thursday
-
-          
-'''
