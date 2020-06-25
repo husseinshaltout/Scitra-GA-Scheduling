@@ -17,7 +17,7 @@ class StorageTank(object):
 
 class Product(object):
     machines = []
-    def __init__(self, pName, mixerNo, productionLine, netSpeed, cycleTime, PLcleaningtime, PPST, isOutSourced):
+    def __init__(self, pName, mixerNo, productionLine, netSpeed, cycleTime, PLcleaningtime, PPST, demand):
         self.name = pName #Product name
         self.MNO = mixerNo #Mixer number
         self.line = productionLine #Production Line
@@ -25,7 +25,7 @@ class Product(object):
         self.cTime = cycleTime #Cycle time
         self.PLCT = PLcleaningtime #Production line cleaing time
         self.PPST = PPST #Number of products per storage tank
-        self.isOutSourced = isOutSourced
+        self.demand = demand #Demand        
     def __repr__(self):
         return str(self.name)  
 
@@ -48,22 +48,20 @@ storagetank_8 = StorageTank("StorageTank 8", 2)
 
 Rollon_PL = ProductionLine("Rollon")
 Tubes_PL = ProductionLine("Tubes")
-Cream1_PL = ProductionLine("Cream 1")
-Cream2_PL = ProductionLine("Cream 2")
+Cream1_PL = ProductionLine("Cream_1")
+Cream2_PL = ProductionLine("Cream_2")
 
-Cream_Starwors50 = Product("Cream_Starwors50", mixer_2, Cream1_PL, 80, 2, 8, 40000, False)
-Cream_Jungle150 = Product("Cream_Jungle150", mixer_2, Cream2_PL, 48, 2, 5, 13333, False)
-Rollon_STarwors50 = Product("Rollon_STarwors50", mixer_2, Rollon_PL, 9600, 2, 4, 40000, False)
-Tube_Jungle50 = Product("Tube_Jungle50 ", mixer_2, Tubes_PL, 72, 2, 9, 40000, False)
+Cream_Starwors50 = Product("Cream_Starwors50", mixer_2, Cream1_PL, 80, 2, 8, 40000, 40000)
+Cream_Jungle150 = Product("Cream_Jungle150", mixer_2, Cream2_PL, 48, 2, 5, 13333, 16000)
+Rollon_STarwors50 = Product("Rollon_STarwors50", mixer_2, Rollon_PL, 9600, 2, 4, 40000, 242000)
+Tube_Jungle50 = Product("Tube_Jungle50 ", mixer_2, Tubes_PL, 72, 2, 9, 40000, 6000)
 
 StorangeTanks = [storagetank_1, storagetank_2, storagetank_3, storagetank_4, storagetank_5, storagetank_6, storagetank_7, storagetank_8]
 
 jobs = [Cream_Starwors50, Cream_Jungle150, Rollon_STarwors50, Tube_Jungle50]
 machines = [mixer_2, Rollon_PL, Tubes_PL, Cream1_PL, Cream2_PL, StorangeTanks]
-operations = [(machines[0],jobs[0]),(machines[5][1],jobs[0])]
+# operations = [(machines[0],jobs[0]),(machines[5][1],jobs[0])]
 
-print(Cream_Starwors50.name, Cream_Jungle150.MNO.cT + Cream_Jungle150.cTime)
-print(Cream_Jungle150.name, Cream_Jungle150.MNO.cT + Cream_Jungle150.cTime)
 
 Tobestored = []
 
