@@ -38,21 +38,13 @@ class fitness(object):
         score = 0
         schedulearray = self.schedule.getGeneArray()
         makespandict = {}
-        # demanddict = {}
-        # PLclass = ProductionLine("PLclass")
-        #get solts for each product
+        
         for i in schedulearray:
             for j in i:
                 if j[1] in makespandict:
                     makespandict[j[1]].append(schedulearray.index(i))                  
                 else:
-                    makespandict[j[1]] = [schedulearray.index(i)]                    
-#                 #Dict for cleaning time
-#                 if type(j[0]) == type(PLclass):
-#                     if j[1] in demanddict:
-#                         demanddict[j[1]].append(j[1].PLCT)  
-#                     else:
-#                         demanddict[j[1]] = [j[1].PLCT]                                
+                    makespandict[j[1]] = [schedulearray.index(i)]                                               
         totalmakespan = 0            
         for i in makespandict:  
             #add total makespan last solt of operation - first slot
@@ -76,7 +68,7 @@ class Schedule(object):
             Mdur = i[0][1].cTime
             STdur = 1
             PLdur = i[2][1].PLCT
-            #Prodcution
+            #Production
             SlotsperTank = int(math.ceil(i[2][1].PPST/(i[2][1].speed*60)))
             Nbatch = int(math.ceil(i[2][1].demand/i[2][1].PPST))   
             pos1 = random.randrange(0, self.chromosome.genes - Mdur)
