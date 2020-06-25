@@ -60,10 +60,10 @@ class Schedule(object):
         self.length=length
 
     def initialize(self):
-        #For each product make list of operations = tuble of machine and product
+        #For each product make list of operations = tuple of machine and product
         O = []
         '''
-        create a list of operations for each job each operation is tuble of the 
+        create a list of operations for each job each operation is tuple of the 
         machine(mixer, storage tank, production line) and the product
         '''
         for i in jobs:
