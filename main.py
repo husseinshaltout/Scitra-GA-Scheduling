@@ -38,13 +38,14 @@ class fitness(object):
         score = 0
         schedulearray = self.schedule.getGeneArray()
         makespandict = {}
-        
+
         for i in schedulearray:
             for j in i:
                 if j[1] in makespandict:
                     makespandict[j[1]].append(schedulearray.index(i))                  
                 else:
-                    makespandict[j[1]] = [schedulearray.index(i)]                                               
+                    makespandict[j[1]] = [schedulearray.index(i)]                    
+                         
         totalmakespan = 0            
         for i in makespandict:  
             #add total makespan last solt of operation - first slot
@@ -61,16 +62,25 @@ class Schedule(object):
     def initialize(self):
         #For each product make list of operations = tuble of machine and product
         O = []
-
+        '''
+        create a list of operations for each job each operation is tuble of the 
+        machine(mixer, storage tank, production line) and the product
+        '''
         for i in jobs:
             O.append([(i.MNO, i), (storagetank_1,i), (i.line,i)])
+        '''add the operation randomly for continous  number of slots needed '''
         for i in O:  
+            #Mixing duration
             Mdur = i[0][1].cTime
+            #Storing duration
             STdur = 1
+            #Production duration
             PLdur = i[2][1].PLCT
             #Production
+            #Calculating number of batches needed for a product to full fill demand
             SlotsperTank = int(math.ceil(i[2][1].PPST/(i[2][1].speed*60)))
-            Nbatch = int(math.ceil(i[2][1].demand/i[2][1].PPST))   
+            Nbatch = int(math.ceil(i[2][1].demand/i[2][1].PPST)) 
+            #Selecting random slots for mixing, storing and production  
             pos1 = random.randrange(0, self.chromosome.genes - Mdur)
             pos2 = random.randrange(0, self.chromosome.genes - STdur)
             pos3 = random.randrange(0, self.chromosome.genes - (PLdur + SlotsperTank))
@@ -169,19 +179,15 @@ def breed(schParentA, schParentB):
     childP1={}
     childP2={}
     childP3={}
-#     print("PAhash:",PAhash)
-#     print("PBhash:",PBhash)
+
     #Radom portion of Parent A
-#     geneA = int(random.random() * schParentA.getlength())
     geneA = int(random.randrange(0,len(list(PAhash.keys()))))
     #Radom portion of Parent B
     geneB = int(random.randrange(0,len(list(PBhash.keys()))))
 
     startGene = min(geneA, geneB)
     endGene = max(geneA, geneB)
-#     print("Start Gene: ",startGene)
-#     print("End Gene:",endGene)
-    
+
     #First half from parent A
     childP1={k: PAhash[k] for k in list(PAhash.keys())[:startGene]}
     #Second half from parent B
@@ -192,10 +198,7 @@ def breed(schParentA, schParentB):
     child.update(childP1)
     child.update(childP2)
     child.update(childP3)
-#     print("childP1",childP1)
-#     print("childP2",childP2)
-#     print("childP3",childP1)
-    print(child)
+
     childSch = hashReverse(child,schParentA.getlength())
 
     return childSch
@@ -241,7 +244,7 @@ def getNextGen(currentGen, eliteSize, mutationRate, mutationSize):
     children = crossover(matingpool, eliteSize)
     nextGenHashes = mutatePop(children, mutationRate, mutationSize)    
     nextGeneration=[]
-#     print(nextGenHashes)
+
     for i in nextGenHashes:
         individual=hashReverse(i,len(currentGen))
         nextGeneration.append(individual)
@@ -268,10 +271,3 @@ def geneticAlgorithm(popSize, days, slots, machines, eliteSize, mutationRate, mu
     bestSchedule = pop[bestScheduleIndex]
     return bestSchedule
 ga = geneticAlgorithm(popSize=10,days=7,slots=24,machines=6, eliteSize=1, mutationRate=0.01, mutationSize=1,generations=10)    
-
-# def start(days, hours, machines, popsize):
-#     length = days*hours*machines
-#     pop = CreateInitPop(length,popsize)
-#     return displayPop(pop)
-
-# start(7,24,2,10)    
