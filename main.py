@@ -38,14 +38,21 @@ class fitness(object):
         score = 0
         schedulearray = self.schedule.getGeneArray()
         makespandict = {}
-
+        # demanddict = {}
+        # PLclass = ProductionLine("PLclass")
+        #get solts for each product
         for i in schedulearray:
             for j in i:
                 if j[1] in makespandict:
                     makespandict[j[1]].append(schedulearray.index(i))                  
                 else:
                     makespandict[j[1]] = [schedulearray.index(i)]                    
-                         
+#                 #Dict for cleaning time
+#                 if type(j[0]) == type(PLclass):
+#                     if j[1] in demanddict:
+#                         demanddict[j[1]].append(j[1].PLCT)  
+#                     else:
+#                         demanddict[j[1]] = [j[1].PLCT]                                
         totalmakespan = 0            
         for i in makespandict:  
             #add total makespan last solt of operation - first slot
@@ -60,10 +67,10 @@ class Schedule(object):
         self.length=length
 
     def initialize(self):
-        #For each product make list of operations = tuble of machine and product
+        #For each product make list of operations = tuple of machine and product
         O = []
         '''
-        create a list of operations for each job each operation is tuble of the 
+        create a list of operations for each job each operation is tuple of the 
         machine(mixer, storage tank, production line) and the product
         '''
         for i in jobs:
@@ -271,3 +278,10 @@ def geneticAlgorithm(popSize, days, slots, machines, eliteSize, mutationRate, mu
     bestSchedule = pop[bestScheduleIndex]
     return bestSchedule
 ga = geneticAlgorithm(popSize=10,days=7,slots=24,machines=6, eliteSize=1, mutationRate=0.01, mutationSize=1,generations=10)    
+
+# def start(days, hours, machines, popsize):
+#     length = days*hours*machines
+#     pop = CreateInitPop(length,popsize)
+#     return displayPop(pop)
+
+# start(7,24,2,10)    
