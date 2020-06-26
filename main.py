@@ -90,14 +90,22 @@ class Schedule(object):
             pos2 = random.randrange(0, self.chromosome.genes - STdur)
             pos3 = random.randrange(0, self.chromosome.genes - (PLdur + SlotsperTank))
             #For number of batches needed to fulfill demand
-            for n in range(Nbatch):                                 
-                i[0][1].btachno = n
+            for n in range(Nbatch):                
+#                 #check if the same operation is in the same slot
+#                 if i[0] in self.chromosome.geneArray[pos1]:
+#                     pos1 = random.randrange(0, self.chromosome.genes - Mdur)                    
                 #assign mixing operation
                 for j in range(Mdur, 0, -1):
                     self.chromosome.geneArray[pos1 + j].append(i[0])                
+#                 #check if the same operation is in the same slot
+#                 if i[1] in self.chromosome.geneArray[pos2]:
+#                     pos2 = random.randrange(0, self.chromosome.genes - STdur)
                 #assign storing operation
                 for k in range(STdur, 0, -1):                
                         self.chromosome.geneArray[pos2 + k].append(i[1])                
+#                 #check if the same operation is in the same slot
+#                 if i[2] in self.chromosome.geneArray[pos3]:
+#                     pos3 = random.randrange(0, self.chromosome.genes - (PLdur + SlotsperTank))
                 #assin production and cleaining
                 for m in range(SlotsperTank + PLdur, 0, -1):                
                     self.chromosome.geneArray[pos3 + m].append(i[2])    

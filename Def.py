@@ -25,8 +25,7 @@ class Product(object):
         self.cTime = cycleTime #Cycle time
         self.PLCT = PLcleaningtime #Production line cleaing time
         self.PPST = PPST #Number of products per storage tank
-        self.demand = demand #Demand  
-        self.btachno = 0      
+        self.demand = demand #Demand        
     def __repr__(self):
         return str(self.name)  
 
