@@ -38,8 +38,8 @@ class fitness(object):
         score = 0
         schedulearray = self.schedule.getGeneArray()
         makespandict = {}
-        # demanddict = {}
-        # PLclass = ProductionLine("PLclass")
+        demanddict = {}
+        PLclass = ProductionLine("PLclass")
         #get solts for each product
         for i in schedulearray:
             for j in i:
@@ -47,16 +47,22 @@ class fitness(object):
                     makespandict[j[1]].append(schedulearray.index(i))                  
                 else:
                     makespandict[j[1]] = [schedulearray.index(i)]                    
-#                 #Dict for cleaning time
-#                 if type(j[0]) == type(PLclass):
-#                     if j[1] in demanddict:
-#                         demanddict[j[1]].append(j[1].PLCT)  
-#                     else:
-#                         demanddict[j[1]] = [j[1].PLCT]                                
+                        
         totalmakespan = 0            
         for i in makespandict:  
             #add total makespan last solt of operation - first slot
             totalmakespan += (makespandict[i][-1] - makespandict[i][0]) + 1
+        #check for clashes
+        temp=[]
+        flag=0
+        for k in schedulearray:
+            for m in k:
+                if (m in temp):
+                    flag=1
+                else:
+                    temp.append(m)
+            if flag==1:
+                ms += 1
            
         return totalmakespan
 
@@ -67,42 +73,42 @@ class Schedule(object):
         self.length=length
 
     def initialize(self):
-        #For each product make list of operations = tuple of machine and product
+        #For each product make list of operations = tuble of machine and product
         O = []
-        '''
-        create a list of operations for each job each operation is tuple of the 
-        machine(mixer, storage tank, production line) and the product
-        '''
+
         for i in jobs:
             O.append([(i.MNO, i), (storagetank_1,i), (i.line,i)])
-        '''add the operation randomly for continous  number of slots needed '''
         for i in O:  
-            #Mixing duration
             Mdur = i[0][1].cTime
-            #Storing duration
             STdur = 1
-            #Production duration
             PLdur = i[2][1].PLCT
-            #Production
-            #Calculating number of batches needed for a product to full fill demand
+
+            #Prodcution
             SlotsperTank = int(math.ceil(i[2][1].PPST/(i[2][1].speed*60)))
-            Nbatch = int(math.ceil(i[2][1].demand/i[2][1].PPST)) 
-            #Selecting random slots for mixing, storing and production  
+            Nbatch = int(math.ceil(i[2][1].demand/i[2][1].PPST))              
             pos1 = random.randrange(0, self.chromosome.genes - Mdur)
             pos2 = random.randrange(0, self.chromosome.genes - STdur)
             pos3 = random.randrange(0, self.chromosome.genes - (PLdur + SlotsperTank))
-
-            #assign mixing operation
-            for j in range(Mdur, 0, -1):
-                self.chromosome.geneArray[pos1 + j].append(i[0])
-            #assign storing operation
-            for k in range(STdur, 0, -1):                
-                self.chromosome.geneArray[pos2 + k].append(i[1])
             #For number of batches needed to fulfill demand
-            for n in range(Nbatch):
+            for n in range(Nbatch):                
+#                 #check if the same operation is in the same slot
+#                 if i[0] in self.chromosome.geneArray[pos1]:
+#                     pos1 = random.randrange(0, self.chromosome.genes - Mdur)                    
+                #assign mixing operation
+                for j in range(Mdur, 0, -1):
+                    self.chromosome.geneArray[pos1 + j].append(i[0])                
+#                 #check if the same operation is in the same slot
+#                 if i[1] in self.chromosome.geneArray[pos2]:
+#                     pos2 = random.randrange(0, self.chromosome.genes - STdur)
+                #assign storing operation
+                for k in range(STdur, 0, -1):                
+                        self.chromosome.geneArray[pos2 + k].append(i[1])                
+#                 #check if the same operation is in the same slot
+#                 if i[2] in self.chromosome.geneArray[pos3]:
+#                     pos3 = random.randrange(0, self.chromosome.genes - (PLdur + SlotsperTank))
                 #assin production and cleaining
                 for m in range(SlotsperTank + PLdur, 0, -1):                
-                    self.chromosome.geneArray[pos3 + m].append(i[2])   
+                    self.chromosome.geneArray[pos3 + m].append(i[2])    
                 
     def populateSchedule(self,hashtable):
         for i in hashtable.keys():
@@ -118,6 +124,7 @@ class Schedule(object):
         return str(self.chromosome.geneArray)
     def __len__(self):
         return len(self.chromosome.geneArray)
+
 
 def hashing(sch):
     hashtable={}
@@ -253,7 +260,7 @@ def getNextGen(currentGen, eliteSize, mutationRate, mutationSize):
     nextGeneration=[]
 
     for i in nextGenHashes:
-        individual=hashReverse(i,len(currentGen))
+        individual=hashReverse(i,len(currentGen[0]))
         nextGeneration.append(individual)
     return nextGeneration        
 
@@ -263,8 +270,8 @@ def displayPop(population):
         displaylist.append(i)
     print(displaylist)
 
-def geneticAlgorithm(popSize, days, slots, machines, eliteSize, mutationRate, mutationSize, generations):
-    length=days*slots*machines
+def geneticAlgorithm(popSize, days, slots, eliteSize, mutationRate, mutationSize, generations):
+    length=days*slots
     pop = CreateInitPop(length, popSize)
     print("Initial Score: %d"%rank(pop)[0][1])
 #     displayPop(pop)
@@ -277,11 +284,5 @@ def geneticAlgorithm(popSize, days, slots, machines, eliteSize, mutationRate, mu
     bestScheduleIndex = rank(pop)[0][0]
     bestSchedule = pop[bestScheduleIndex]
     return bestSchedule
-ga = geneticAlgorithm(popSize=10,days=7,slots=24,machines=6, eliteSize=1, mutationRate=0.01, mutationSize=1,generations=10)    
-
-# def start(days, hours, machines, popsize):
-#     length = days*hours*machines
-#     pop = CreateInitPop(length,popsize)
-#     return displayPop(pop)
-
-# start(7,24,2,10)    
+    
+ga = geneticAlgorithm(popSize=10,days=7,slots=24, eliteSize=1, mutationRate=0.01, mutationSize=1,generations=10)    
