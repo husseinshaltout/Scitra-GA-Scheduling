@@ -26,8 +26,8 @@ class Product(object):
         self.PLCT = PLcleaningtime #Production line cleaing time
         self.PPST = PPST #Number of products per storage tank
         self.demand = demand #Demand  
-        self.btachno = 0 #Batch number identifier      
-    def __repr__(self):
+        self.batchno = 0 #Batch number identifier      
+    def __str__(self):
         return str(self.name)  
 
 class ProductionLine(object):

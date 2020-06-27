@@ -82,31 +82,29 @@ class Schedule(object):
             Mdur = i[0][1].cTime
             STdur = 1
             PLdur = i[2][1].PLCT
-
             #Prodcution
             SlotsperTank = int(math.ceil(i[2][1].PPST/(i[2][1].speed*60)))
             Nbatch = int(math.ceil(i[2][1].demand/i[2][1].PPST))              
-            pos1 = random.randrange(0, self.chromosome.genes - Mdur)
-            pos2 = random.randrange(0, self.chromosome.genes - STdur)
-            pos3 = random.randrange(0, self.chromosome.genes - (PLdur + SlotsperTank))
             #For number of batches needed to fulfill demand
-            for n in range(Nbatch):   
+            for n in range(Nbatch):  
+                pos3 = random.randrange(0, self.chromosome.genes - (PLdur + SlotsperTank + STdur + Mdur))
+                pos2 = random.randrange(0, pos3 - (STdur + Mdur))
+                pos1 = random.randrange(0, pos2 - Mdur)                 
                 i[0][1].btachno = n                              
-                #assign mixing operation
-                for j in range(Mdur, 0, -1):
-                    self.chromosome.geneArray[pos1 + j].append(i[0])                
-                #assign storing operation
-                for k in range(STdur, 0, -1):                
-                        self.chromosome.geneArray[pos2 + k].append(i[1])                
                 #assin production and cleaining
                 for m in range(SlotsperTank + PLdur, 0, -1):                
                     self.chromosome.geneArray[pos3 + m].append(i[2])    
+                #assign storing operation
+                for k in range(STdur, 0, -1):                
+                        self.chromosome.geneArray[pos2 + k].append(i[1])                
+                #assign mixing operation
+                for j in range(Mdur, 0, -1):
+                    self.chromosome.geneArray[pos1 + j].append(i[0])                
                 
     def populateSchedule(self,hashtable):
         for i in hashtable.keys():
             temp=str(i)[-1]
             temp2=int(temp)
-#             print("Key index:",temp2,"len of chromosome", len(self.chromosome.geneArray))
             self.chromosome.geneArray[(temp2)].append(hashtable[i])
     def getGeneArray(self):
         return self.chromosome.geneArray
@@ -116,7 +114,6 @@ class Schedule(object):
         return str(self.chromosome.geneArray)
     def __len__(self):
         return len(self.chromosome.geneArray)
-
 
 def hashing(sch):
     hashtable={}
