@@ -92,9 +92,9 @@ class Schedule(object):
 
     def populateSchedule(self,hashtable):
         for i in hashtable.keys():
-            start = hashtable[i][1]
-            end = hashtable[i][0]+start 
-            for j in range( hashtable[i][0], end-1):
+            start = hashtable[i]
+            end = i.dur + start
+            for j in range(start, end-1):
                 self.chromosome.geneArray[j].append(i)                                             
  
     def getGeneArray(self):
@@ -111,13 +111,9 @@ def encode(schedule):
     genes = schedule.getGeneArray()
     for i in genes:
         for j in range(len(i)):            
-            op = (i[j][0],i[j][1],i[j][1].batchno) #machine, job, batch number
-            #change final slot value only
-            if (op in hashtable):
-                hashtable[op][1] = genes.index(i)
-            else:                
-                #key = (machine, job, batch number)  value = (time-slot, index of operation) 
-                hashtable[op] = [genes.index(i),genes.index(i)]
+            #key = operation  value = (time-slot, index of operation) 
+            if (i[j] not in hashtable):
+                hashtable[i[j]] = genes.index(i)
     return hashtable
 def decode(schHash,length):
     sch = Schedule(length)
@@ -166,38 +162,28 @@ def matingPool(population, selectionPool):
         index = selectionPool[i]
         matingpool.append(population[index])
     return matingpool
-#list of actual indviduals for mating using their index from selection pool    
-
+#list of actual indviduals for mating using their index from selection pool 
+#    
 def breed(schParentA, schParentB):
     child = {}
-    PAhash = hashing(schParentA)
-    PBhash = hashing(schParentB)
+    PAhash = encode(schParentA)
+    PBhash = encode(schParentB)
     childP1={}
     childP2={}
     childP3={}
-
     #Radom portion of Parent A
     geneA = int(random.randrange(0,len(list(PAhash.keys()))))
-    #Radom portion of Parent B
-    geneB = int(random.randrange(0,len(list(PBhash.keys()))))
-
+    geneB = int(random.randrange(0,len(list(PAhash.keys()))))
     startGene = min(geneA, geneB)
     endGene = max(geneA, geneB)
+    
+    #swathfrom parent A
+    childP1={k: PAhash[k] for k in list(PAhash.keys())[startGene:endGene]}
+    #Drop allel
+    for k in list(childP1.keys()):
+        del PBhash[k]
+    
 
-    #First half from parent A
-    childP1={k: PAhash[k] for k in list(PAhash.keys())[:startGene]}
-    #Second half from parent B
-    childP2={k: PBhash[k] for k in list(PBhash.keys())[startGene:endGene+1]}
-    #Rest of the genes from parent A
-    childP3={k: PAhash[k] for k in list(PAhash.keys())[endGene+1:]}
-
-    child.update(childP1)
-    child.update(childP2)
-    child.update(childP3)
-
-    childSch = hashReverse(child,schParentA.getlength())
-
-    return childSch
 
 def crossover(matingpool, eliteSize):
     nextGen = []
@@ -267,4 +253,4 @@ def geneticAlgorithm(popSize, days, slots, eliteSize, mutationRate, mutationSize
     bestSchedule = pop[bestScheduleIndex]
     return bestSchedule
     
-ga = geneticAlgorithm(popSize=10,days=7,slots=24, eliteSize=1, mutationRate=0.01, mutationSize=1,generations=10)    
+ga = geneticAlgorithm(popSize=10,days=2,slots=24, eliteSize=1, mutationRate=0.01, mutationSize=1,generations=10)    
