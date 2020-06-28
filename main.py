@@ -21,7 +21,6 @@ class Chromosome(object):
         self.genes=length
         #Array of genes
         self.geneArray = []
-
     def initChromosom(self):
         #(time-space slot) for each hour slot is list
         for i in range(0,self.genes):
@@ -32,38 +31,22 @@ class Chromosome(object):
 class fitness(object):
     def __init__(self, individual):
         self.schedule = individual
-        self.score=0
+        self.totalmakespan=0
     def computeScore(self):
         '''Takes an individual of the population '''
-        score = 0
+        totalmakespan = 0
         schedulearray = self.schedule.getGeneArray()
         makespandict = {}
-        demanddict = {}
-        PLclass = ProductionLine("PLclass")
         #get solts for each product
         for i in schedulearray:
             for j in i:
                 if j[1] in makespandict:
                     makespandict[j[1]].append(schedulearray.index(i))                  
                 else:
-                    makespandict[j[1]] = [schedulearray.index(i)]                    
-                        
-        totalmakespan = 0            
+                    makespandict[j[1]] = [schedulearray.index(i)]                                                     
         for i in makespandict:  
             #add total makespan last solt of operation - first slot
-            totalmakespan += (makespandict[i][-1] - makespandict[i][0]) + 1
-        #check for clashes
-        temp=[]
-        flag=0
-        for k in schedulearray:
-            for m in k:
-                if (m in temp):
-                    flag=1
-                else:
-                    temp.append(m)
-            if flag==1:
-                ms += 1
-           
+            totalmakespan += (makespandict[i][-1] - makespandict[i][0]) + 1           
         return totalmakespan
 
 class Schedule(object):
@@ -71,41 +54,49 @@ class Schedule(object):
         self.chromosome=Chromosome(length)
         self.chromosome.initChromosom()
         self.length=length
+        
+    def stpick(self, STdict, pos):
+        for i in list(STdict.keys()):
+            if pos not in STdict[i]:               
+                return i
 
     def initialize(self):
         #For each product make list of operations = tuble of machine and product
-        O = []
-
+        Ops = []#list of operations
+        #Creating operations for each job
         for i in jobs:
-            O.append([(i.MNO, i), (storagetank_1,i), (i.line,i)])
-        for i in O:  
-            Mdur = i[0][1].cTime
-            STdur = 1
-            PLdur = i[2][1].PLCT
-            #Prodcution
-            SlotsperTank = int(math.ceil(i[2][1].PPST/(i[2][1].speed*60)))
-            Nbatch = int(math.ceil(i[2][1].demand/i[2][1].PPST))              
-            #For number of batches needed to fulfill demand
+            SlotsperTank = int(math.ceil(i.PPST/(i.speed*60)))
+            Nbatch = int(math.ceil(i.demand/i.PPST)) 
             for n in range(Nbatch):  
-                pos3 = random.randrange(0, self.chromosome.genes - (PLdur + SlotsperTank + STdur + Mdur))
-                pos2 = random.randrange(0, pos3 - (STdur + Mdur))
-                pos1 = random.randrange(0, pos2 - Mdur)                 
-                i[0][1].btachno = n                              
-                #assin production and cleaining
-                for m in range(SlotsperTank + PLdur, 0, -1):                
-                    self.chromosome.geneArray[pos3 + m].append(i[2])    
-                #assign storing operation
-                for k in range(STdur, 0, -1):                
-                        self.chromosome.geneArray[pos2 + k].append(i[1])                
-                #assign mixing operation
-                for j in range(Mdur, 0, -1):
-                    self.chromosome.geneArray[pos1 + j].append(i[0])                
-                
+                Ops.append([Operation(i.MNO, i, n, i.cTime), Operation(storagetank_2, i, n, SlotsperTank + i.PLCT), Operation(i.line, i, n, SlotsperTank + i.PLCT)])
+        for i in Ops:         
+            #Production Line rand positon
+            pos3 = random.randrange(0, self.chromosome.genes - (i[2].dur + i[0].dur))
+            #Mixer rand positon
+            pos1 = random.randrange(0, self.chromosome.genes - i[0].dur) 
+            i[1].set_machine(self.stpick(STdict, pos1+1))
+            #assign production, storing and cleaining operation
+            for m in range(i[2].dur, 0, -1):                
+                self.chromosome.geneArray[pos3 + m].append(i[2])    
+                self.chromosome.geneArray[pos3 + m].append(i[1]) 
+                #Used slot added to Storage tank selection dict                 
+                STdict[i[1].machine].append(pos3 + m)                      
+            #assign mixing operation
+            for j in range(i[0].dur, 0, -1):
+                self.chromosome.geneArray[pos1 + j].append(i[0])  
+#             #Storing   
+#             for k in range(pos3, pos1+1, -1):
+#                 #one slot after mixing final slot
+#                 self.chromosome.geneArray[pos1 + i[0].dur + 1 + k].append(i[1])
+#                 STdict[i[1].machine].append(pos1 + i[0].dur + 1 + k)  
+
     def populateSchedule(self,hashtable):
         for i in hashtable.keys():
-            temp=str(i)[-1]
-            temp2=int(temp)
-            self.chromosome.geneArray[(temp2)].append(hashtable[i])
+            start = hashtable[i][1]
+            end = hashtable[i][0]+start 
+            for j in range( hashtable[i][0], end-1):
+                self.chromosome.geneArray[j].append(i)                                             
+ 
     def getGeneArray(self):
         return self.chromosome.geneArray
     def getlength(self):
@@ -115,21 +106,23 @@ class Schedule(object):
     def __len__(self):
         return len(self.chromosome.geneArray)
 
-def hashing(sch):
-    hashtable={}
-    genes=sch.getGeneArray()
-    # obtain the firstslot at which an operation begins (its position in vector)
-    #position is key operation is the value
-    #time slot postition + 10 * position in time slot
-    for i in genes:  
-        for j in range(len(i)):
-            hashtable[(genes.index(i)+(10*j))]=i[j]
+def encode(schedule):
+    hashtable = {}
+    genes = schedule.getGeneArray()
+    for i in genes:
+        for j in range(len(i)):            
+            op = (i[j][0],i[j][1],i[j][1].batchno) #machine, job, batch number
+            #change final slot value only
+            if (op in hashtable):
+                hashtable[op][1] = genes.index(i)
+            else:                
+                #key = (machine, job, batch number)  value = (time-slot, index of operation) 
+                hashtable[op] = [genes.index(i),genes.index(i)]
     return hashtable
- 
-def hashReverse(schHash,length):
+def decode(schHash,length):
     sch = Schedule(length)
     sch.populateSchedule(schHash)
-    return sch 
+    return sch
 
 def CreateInitPop(length, gensize):
     generation = []
