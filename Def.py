@@ -26,8 +26,7 @@ class Product(object):
         self.PLCT = PLcleaningtime #Production line cleaing time
         self.PPST = PPST #Number of products per storage tank
         self.demand = demand #Demand  
-        self.batchno = 0 #Batch number identifier      
-    def __str__(self):
+    def __repr__(self):
         return str(self.name)  
 
 class ProductionLine(object):
@@ -36,9 +35,22 @@ class ProductionLine(object):
     def __repr__(self):
         return str(self.name)
 
+class Operation(object):
+    def __init__(self, machine, job, batch, duration):
+        self.machine = machine #Machine
+        self.job = job #Job or product
+        self.batchno = batch #Batch number
+        self.dur = duration #Operation duration
+        self.name = (self.machine, self.job) 
+    def set_machine(self, m):
+        self.machine = m
+        self.name = (self.machine, self.job)
+    def __repr__(self):
+        return str(self.name)
+
 mixer_2 = Mixer(2,1)
 
-storagetank_1 = StorageTank("StorageTank_1", 2)
+storagetank_1 = StorageTank("StorageTank 1", 2)
 storagetank_2 = StorageTank("StorageTank 2", 2)
 storagetank_3 = StorageTank("StorageTank 3", 2)
 storagetank_4 = StorageTank("StorageTank 4", 2)
@@ -52,10 +64,10 @@ Tubes_PL = ProductionLine("Tubes")
 Cream1_PL = ProductionLine("Cream_1")
 Cream2_PL = ProductionLine("Cream_2")
 
-# Cream_Starwors50 = Product("Cream_Starwors50", mixer_2, Cream1_PL, 80, 2, 8, 40000, 40000)
-# Cream_Jungle150 = Product("Cream_Jungle150", mixer_2, Cream2_PL, 48, 2, 5, 13333, 16000)
-# Rollon_STarwors50 = Product("Rollon_STarwors50", mixer_2, Rollon_PL, 9600, 2, 4, 40000, 242000)
-# Tube_Jungle50 = Product("Tube_Jungle50 ", mixer_2, Tubes_PL, 72, 2, 9, 40000, 6000)
+Cream_Starwors50 = Product("Cream_Starwors50", mixer_2, Cream1_PL, 80, 2, 8, 40000, 40000)
+Cream_Jungle150 = Product("Cream_Jungle150", mixer_2, Cream2_PL, 48, 2, 5, 13333, 16000)
+Rollon_STarwors50 = Product("Rollon_STarwors50", mixer_2, Rollon_PL, 9600, 2, 4, 40000, 80000)
+Tube_Jungle50 = Product("Tube_Jungle50 ", mixer_2, Tubes_PL, 72, 2, 9, 40000, 6000)
 
 
 product_1 = Product("Product_1", mixer_2, Cream1_PL, 160, 2, 1,40000,80000)
@@ -70,9 +82,13 @@ product_9 = Product("Product_9", mixer_2, Tubes_PL, 96, 2, 1, 13333, 11000)
 product_10 = Product("Product_10", mixer_2, Tubes_PL, 120, 2, 1, 20000, 18500)
 
 StorangeTanks = [storagetank_1, storagetank_2, storagetank_3, storagetank_4, storagetank_5, storagetank_6, storagetank_7, storagetank_8]
-
-jobs = [product_1, product_2, product_3, product_4, product_5, product_6, product_7, product_8, product_9, product_10]
-# jobs = [Cream_Starwors50, Cream_Jungle150, Rollon_STarwors50, Tube_Jungle50]
+STdict = {}
+def stinit(ST):
+    for i in ST:
+        STdict[i] = []
+stinit(StorangeTanks)
+# jobs = [product_1, product_2, product_3, product_4, product_5, product_6, product_7, product_8, product_9, product_10]
+jobs = [Cream_Starwors50, Cream_Jungle150, Rollon_STarwors50, Tube_Jungle50]
 machines = [mixer_2, Rollon_PL, Tubes_PL, Cream1_PL, Cream2_PL, StorangeTanks]
 
 
