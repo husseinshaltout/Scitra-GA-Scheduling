@@ -165,12 +165,10 @@ def matingPool(population, selectionPool):
 #list of actual indviduals for mating using their index from selection pool 
 #    
 def breed(schParentA, schParentB):
-    child = {}
+    # child = {}
     PAhash = encode(schParentA)
     PBhash = encode(schParentB)
     childP1={}
-    childP2={}
-    childP3={}
     #Radom portion of Parent A
     geneA = int(random.randrange(0,len(list(PAhash.keys()))))
     geneB = int(random.randrange(0,len(list(PAhash.keys()))))
@@ -182,7 +180,7 @@ def breed(schParentA, schParentB):
     #Drop allel
     for k in list(childP1.keys()):
         del PBhash[k]
-    
+    #Add from parent B starting from right side
 
 
 def crossover(matingpool, eliteSize):
